@@ -9,9 +9,7 @@ int main(int argc, const char *argv[])
 	while (cur_n++ != ITE_N)
 	{
 		UpdatePandGbest();    //更新个体历史最优解P和全局最优解GBest
-		UpdateofVandX();        //速度和位置更新，即飞翔
-
-		
+		UpdateofVandX();        //速度和位置更新
 
 	}
 

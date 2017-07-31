@@ -42,19 +42,6 @@ void RandInitofSwarm(void)
 		swarm.Particle[i].Fitness = ComputAFitness(swarm.Particle[i].X);  //计算每个粒子的适应度值
 
 	}
-
-	//double tempgbest;  //设定初代的全局最优值与最优值的粒子的位置索引
-	//tempgbest = swarm.Particle[0].Fitness;
-	//for (i = 0; i < PNum; i++)
-	//{
-	//	if (swarm.Particle[i].Fitness < tempgbest)
-	//	{
-	//		tempgbest = swarm.Particle[i].Fitness;
-	//		swarm.GBestIndex = i; //保存初代最优值索引
-	//	}
-
-	//
-	//}
 	
 
 }
