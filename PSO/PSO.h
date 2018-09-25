@@ -1,9 +1,9 @@
 #ifndef _PSO_H_
 #define _PSO_H_
 
-#define Dim 2		//粒子维度
-#define PNum 20		//种群规模
-#define ITE_N  50  	//最大迭代次数
+#define Dim 1		//粒子维度  根据二进制编码
+#define PNum 10 	//种群规模  一共10辆车
+#define ITE_N  200  	//最大迭代次数
 int cur_n;			//当前迭代次数
 
 					/*惯性权重函数*/
@@ -30,7 +30,7 @@ struct SWARM
 	double Xdown[Dim];
 	double Vmax[Dim];           //速度最大值
 } swarm;
-/*是的，只要三个就好了，更好理解点感觉*/
+
 void RandInitofSwarm(void);
 void UpdateofVandX(void);
 void UpdatePandGbest(void);

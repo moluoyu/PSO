@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="PSO.c" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PSO.h" />

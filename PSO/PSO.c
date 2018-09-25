@@ -21,8 +21,8 @@ void RandInitofSwarm(void)
 	swarm.C2 = 2.0;
 	for (j = 0; j < Dim; j++)
 	{
-		swarm.Xdown[j] = -10;    //搜索空间范围
-		swarm.Xup[j] = 10;
+		swarm.Xdown[j] = 15;    //搜索空间范围，绿灯时间最小值
+		swarm.Xup[j] = 90;		// 绿灯时间最大值
 		swarm.Vmax[j] = 0.1;       //粒子飞翔速度最大值
 	}
 
@@ -82,7 +82,6 @@ void UpdateofVandX(void)
 		/*********
 		2017/7/26
 		因为少了下面这行代码，找了一个晚上
-		你xiangbuxiangtongsiziji
 		**********/
 		
 		swarm.Particle[i].Fitness = ComputAFitness(swarm.Particle[i].X);  //重新计算每个粒子的适应度值
@@ -94,7 +93,7 @@ void UpdateofVandX(void)
 void UpdatePandGbest(void)
 {
 	int i, j;
-	//update of P if the X is bigger than current P
+	//update of P if the X is less than current P
 	for (i = 0; i < PNum; i++)
 	{
 		if (swarm.Particle[i].Fitness < ComputAFitness(swarm.Particle[i].P)) //更新当前这一代个体p值，
