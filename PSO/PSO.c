@@ -4,7 +4,10 @@
 #include "math.h"
 #include "pso.h"
 
+f()
+{
 
+}
 /*计算适应度函数的适应度*/
 static double ComputAFitness(double X[]) //求x^2 + y^2 + 3 最小值
 {
