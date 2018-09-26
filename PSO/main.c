@@ -21,11 +21,6 @@
  */
 #include "pso.h"
 #include "stdio.h"
-int  test()
-{
-	printf("hehlllo");
-}
-
 int main(int argc, const char *argv[])
 {
 	cur_n = 0;           //当前代数
