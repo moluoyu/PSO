@@ -3,6 +3,7 @@
 #include "time.h"
 #include "math.h"
 #include "pso.h"
+#include <memory.h>
 /**
 * \method
 *
@@ -13,56 +14,36 @@
 * \author thnx1
 * \date 九月 2018
 */
-int numofVehicle(double X[], int n)
+//int numOfLoad1 = 0, numOfLoad2 = 0, numOfLoad3 = 0;????还是有问题
+int numofVehicle(struct PARTICLE* particle,double X[], int n)
 {
 	int num = 0;
-	int numOfLoad1 = 0, numOfLoad2 = 0, numOfLoad3 = 0;
-
+	int resOfV=0;
+	int tempNum1 = 0, tempNum2 = 0, tempNum3 = 0;
+	//printf("%d,%d,%d\n", particle->numOfLoad1, particle->numOfLoad2, particle->numOfLoad3);
 	if (4 == (int)X[n])
 	{
-		for (int i = 1; i <= n; i++)
-		{
-			if (4 == (int)X[i])
-				numOfLoad1++;
-		}
-		return numOfLoad1;
+		
+		tempNum1++;
+		particle->numOfLoad1 += tempNum1;
+		resOfV = particle->numOfLoad1;
 	}
 	if (2 == (int)X[n])
 	{
-		for (int i = 1; i <= n; i++)
-		{
-			if (2 == (int)X[i])
-				numOfLoad2++;
-		}
-		return numOfLoad2;
+		
+		tempNum2++;
+		particle->numOfLoad2 += tempNum2;
+		resOfV = particle->numOfLoad2;
 	}
 	if (1 == (int)X[n])
 	{
-		for (int i = 1; i <= n; i++)
-		{
-			if (4 == (int)X[i])
-				numOfLoad3++;
-		}
-		return numOfLoad3;
+		
+		tempNum3++;
+		particle->numOfLoad3 += tempNum3;
+		resOfV = particle->numOfLoad3;
 	}
+	return resOfV;
 }
-/**
-* \method
-*impedance function
-阻抗函数
-* \brief
-* \param
-* \param
-* \author thnx1
-* \date 九月 2018
-*/
-double impedOfLoad(int volatile traffic, int id)
-{
-
-
-
-}
-
 /**
 * \method
 *
@@ -76,75 +57,106 @@ double impedOfLoad(int volatile traffic, int id)
 * \author thnx1
 * \date 九月 2018
 */
-double countCost(double X[], int n)
+double countCost(struct PARTICLE* particle,double X[], int n)
 {
-	int volatile traffic = 0;
-	double costTime = 0;
-	double res = 0.0;
-	int  totalNum = numofVehicle(X, n);
+	double traffic = 0.0;
+	double costTime = 0.0;
+	double gapofTime = 0.0;
+	double resOfC = 0.0;
+	int  totalNum = numofVehicle(particle,X, n);
 	switch ((int)X[n])
 	{
+		/**
+		 * \brief
+		 * 后续版本（待做）： * BPR函数计算不同交通流量下的路阻函数         t=t0(1+a(q/c)^b)
+		 *
+		 */
 	case 4:
-		traffic = totalNum / gapofTime;
-		if (traffic > 0 && traffic < 0.3*capOfLoad1)//随着车流量的增加，Cost应该越来越大  欠饱和
+		if (particle->numOfLoad1 > 1)
 		{
+			gapofTime = ((n - 1)*5.0);//每5min间隔进行发一辆车
+			traffic = (double)totalNum / gapofTime;//待修改为bpr函数
+			if (traffic >= 0 && traffic <= 0.3*capOfLoad1)//随着车流量的增加，Cost应该越来越大  欠饱和
+			{
+				resOfC = 4.0;
+			}
+			else if (traffic > 0.3*capOfLoad1 && traffic <= 0.6*capOfLoad1)//正常饱和
+			{
+				resOfC = 5.0;
+			}
+			else if (traffic > 0.6*capOfLoad1 && traffic <= capOfLoad1)//过饱和
+			{
+				resOfC = 6.0;
+			}
 
-			res = impedOfLoad(traffic, 4);
 		}
-		else if (traffic > 0.3*capOfLoad1 && traffic < 0.6*capOfLoad1)//正常饱和
+		else//最开始时,由于车流比较小，没法计算路阻函数值
 		{
-			res = impedOfLoad(traffic, 4);
-		}
-		else if (traffic > 0.6*capOfLoad1 && traffic <= capOfLoad1)//过饱和
-		{
-			res = impedOfLoad(traffic, 4);
+			resOfC = 4.0;
 		}
 		break;
 	case 2:
-		traffic = totalNum / gapofTime;
-		if (traffic > 0 && traffic < 0.3*capOfLoad1)//随着车流量的增加，Cost应该越来越大  欠饱和
+		if (particle->numOfLoad2 > 1)
 		{
-			res = impedOfLoad(traffic, 2);
+			gapofTime = ((n - 1)*5.0);
+			traffic = (double)totalNum / gapofTime;
+			if (traffic >= 0 && traffic <= 0.3*capOfLoad1)//随着车流量的增加，Cost应该越来越大 欠饱和
+			{
+				resOfC = 2.0;
+			}
+			else if (traffic > 0.3*capOfLoad1 && traffic <= 0.6*capOfLoad1)//正常饱和
+			{
+				resOfC = 4.0;
+			}
+			else if (traffic > 0.6*capOfLoad1 && traffic <= capOfLoad1)//过饱和
+			{
+				resOfC = 6.0;
+			}
 		}
-		else if (traffic > 0.3*capOfLoad1 && traffic < 0.6*capOfLoad1)//正常饱和
+		else//最开始时,由于车流比较小，没法计算路阻函数值
 		{
-			res = impedOfLoad(traffic, 2);
-		}
-		else if (traffic > 0.6*capOfLoad1 && traffic < capOfLoad1)//过饱和
-		{
-			res = impedOfLoad(traffic, 2);
+			resOfC = 2.0;
 		}
 		break;
 	case 1:
-		traffic = totalNum / gapofTime;
-		if (traffic >= 0 && traffic <= 0.3*capOfLoad1)//随着车流量的增加，Cost应该越来越大  欠饱和
+		if (particle->numOfLoad3 > 1)
 		{
-			res = impedOfLoad(traffic, 1);
+			gapofTime = ((n - 1)*5.0);
+			traffic = (double)totalNum / gapofTime;
+			if (traffic >= 0 && traffic <= 0.3*capOfLoad3)//随着车流量的增加，Cost应该越来越大 欠饱和
+			{
+				resOfC = 1.0;
+			}
+			else if (traffic > 0.3*capOfLoad3 && traffic <= 0.6*capOfLoad3)//正常饱和
+			{
+				resOfC = 2.0;
+			}
+			else if (traffic > 0.6*capOfLoad3 && traffic <= capOfLoad3)//过饱和
+			{
+				resOfC = 3.0;
+			}
 		}
-		else if (traffic > 0.3*capOfLoad1 && traffic <= 0.6*capOfLoad1)//正常饱和
+		else//最开始时,由于车流比较小，没法计算路阻函数值,值过大，不在上述范围内
 		{
-			res = impedOfLoad(traffic, 1);
-		}
-		else if (traffic > 0.6*capOfLoad1 && traffic <= capOfLoad1)//过饱和
-		{
-			res = impedOfLoad(traffic, 1);
+			resOfC = 1.0;
 		}
 		break;
 	}
-	return res;
+	return resOfC;
 }
 
 
-static  double ComputAFitness(double X[]) //
+static  double ComputAFitness(struct PARTICLE* particle,double X[]) //
 {
-	double res = 0.0;
+	double resOfFit = 0.0;
 	for (int i = 1; i < Dim + 1; i++)
 	{
 		//to do code 
-		res += X[i] * countCost((int)X[i], i);
+		resOfFit += countCost(particle,X, i);
 	}
-	return res;
+	return resOfFit;
 }
+
 /**
 * \method
 *
@@ -157,36 +169,36 @@ static  double ComputAFitness(double X[]) //
 * \author thnx1
 * \date 九月 2018
 */
-int randomGenValue()
+double randomGenValue()
 {
 	int a = rand() % 3 + 1;
-	int temp;
+	double temp=0.0;
 	switch (a)
 	{
 	case 1:
-		temp = 1;
+		temp = 1.0;
 		break;
 	case 2:
-		temp = 2;
+		temp = 2.0;
 		break;
 	case 3:
-		temp = 4;
+		temp = 4.0;
 		break;
 	}
 	return  temp;
 }
-int randomGenSpeed()
+double randomGenSpeed()
 {
 
 	int a = rand() % 2 + 1;
-	int temp;
+	double temp=0.0;
 	switch (a)
 	{
 	case 1:
-		temp = 1;
+		temp = 1.0;
 		break;
 	case 2:
-		temp = 2;
+		temp = 2.0;
 		break;
 	}
 	return  temp;
@@ -199,14 +211,15 @@ void RandInitofSwarm(void)
 	//学习因子C1,C2
 	swarm.C1 = 2.0;
 	swarm.C2 = 2.0;
+	swarm.GBestIndex = 1;
 	for (j = 1; j < Dim + 1; j++)
 	{
-		swarm.Xdown[j] = 1;    //每辆车的选择结果最小为1
-		swarm.Xup[j] = 4;		// 每辆车的选择结果最大为4
-		swarm.Vmax[j] = 2;       //粒子飞翔速度最大值
+		swarm.Xdown[j] = 1.0;    //每辆车的选择结果最小为1
+		swarm.Xup[j] = 4.0;		// 每辆车的选择结果最大为4
+		swarm.Vmax[j] = 2.0;       //粒子飞翔速度最大值
 	}
 
-	srand((unsigned)time(0));
+	srand((unsigned)time(NULL));
 	for (i = 1; i < PNum + 1; i++)      //PNum 总群规模，即是粒子个数
 	{
 		for (j = 1; j < Dim + 1; j++)   //设定每个粒子每个维度上的随机位置与随机速度
@@ -222,7 +235,7 @@ void RandInitofSwarm(void)
 
 		}
 
-		swarm.Particle[i].Fitness = ComputAFitness(swarm.Particle[i].X);  //计算每个粒子的适应度值
+		swarm.Particle[i].Fitness = ComputAFitness(&swarm.Particle[i],swarm.Particle[i].X);  //计算每个粒子的适应度值
 
 	}
 
@@ -242,7 +255,7 @@ void UpdateofVandX(void)
 			swarm.Particle[i].V[j] = W_FUN * swarm.Particle[i].V[j] +
 			rand() / (double)RAND_MAX * swarm.C1 * (swarm.Particle[i].P[j] - swarm.Particle[i].X[j]) +
 			rand() / (double)RAND_MAX * swarm.C2 * (swarm.GBest[j] - swarm.Particle[i].X[j]);
-		for (j = 0; j < Dim; j++)
+		for (j = 1; j < Dim+1; j++)
 		{
 			if (swarm.Particle[i].V[j] > swarm.Vmax[j])  //控制粒子速度范围
 			{
@@ -254,26 +267,26 @@ void UpdateofVandX(void)
 			}
 		}
 
-		for (j = 0; j < Dim; j++)     //更新位置：x(i+1)=x(i)+v(i)
+		for (j = 1; j < Dim+1; j++)     //更新位置：x(i+1)=x(i)+v(i)
 		{
 			swarm.Particle[i].X[j] += swarm.Particle[i].V[j];
-			if (swarm.Particle[i].X[j] > swarm.Xup[j])
+			if (swarm.Particle[i].X[j] >= swarm.Xup[j])
 				swarm.Particle[i].X[j] = swarm.Xup[j];
-			if (swarm.Particle[i].X[j] < swarm.Xdown[j])
+			if (swarm.Particle[i].X[j] <= swarm.Xdown[j])
 				swarm.Particle[i].X[j] = swarm.Xdown[j];
 			if (swarm.Particle[i].V[j] > 0)//速度方向为递增
 			{
 				if (swarm.Particle[i].X[j] > 1 && swarm.Particle[i].X[j] < 2)
-					swarm.Particle[i].X[j] = 2;
+					swarm.Particle[i].X[j] = 2.0;
 				if (swarm.Particle[i].X[j] > 2 && swarm.Particle[i].X[j] < 4)
-					swarm.Particle[i].X[j] = 4;
+					swarm.Particle[i].X[j] = 4.0;
 			}
 			if (swarm.Particle[i].V[j] < 0)              //速度方向为递减
 			{
 				if (swarm.Particle[i].X[j] > 1 && swarm.Particle[i].X[j] < 2)
-					swarm.Particle[i].X[j] = 1;
+					swarm.Particle[i].X[j] = 1.0;
 				if (swarm.Particle[i].X[j] > 2 && swarm.Particle[i].X[j] < 4)
-					swarm.Particle[i].X[j] = 2;
+					swarm.Particle[i].X[j] = 2.0;
 			}
 		}
 		/*********
@@ -281,7 +294,8 @@ void UpdateofVandX(void)
 		因为少了下面这行代码，找了一个晚上
 		**********/
 
-		swarm.Particle[i].Fitness = ComputAFitness(swarm.Particle[i].X);  //重新计算每个粒子的适应度值
+		swarm.Particle[i].Fitness = ComputAFitness(&swarm.Particle[i],swarm.Particle[i].X);  //重新计算每个粒子的适应度值
+
 	}
 
 }
@@ -291,11 +305,12 @@ void UpdatePandGbest(void)
 {
 	int i, j;
 	//update of P if the X is less than current P
-	for (i = 0; i < PNum; i++)
+	for (i = 1; i < PNum+1; i++)
 	{
-		if (swarm.Particle[i].Fitness < ComputAFitness(swarm.Particle[i].P)) //更新当前这一代个体p值，
+		//if (swarm.Particle[i].Fitness < ComputAFitness(swarm.Particle[i].P)) //更新当前这一代个体p值，
+		if (swarm.Particle[i].Fitness < ComputAFitness(&swarm.Particle[i],swarm.Particle[i].P)) //更新当前这一代个体p值
 		{
-			for (j = 0; j < Dim; j++)
+			for (j = 1; j < Dim+1; j++)
 			{
 				swarm.Particle[i].P[j] = swarm.Particle[i].X[j];
 			}
@@ -303,30 +318,30 @@ void UpdatePandGbest(void)
 	}
 
 	//update of GBest
+	//当前代数中所有粒子中的最优值
 
-	for (i = 0; i < PNum; i++)
+	for (i = 1; i < PNum + 1; i++)
 	{
 
-		if (ComputAFitness(swarm.Particle[i].P) < ComputAFitness(swarm.Particle[swarm.GBestIndex].P))
+		if (ComputAFitness(&swarm.Particle[i],swarm.Particle[i].P) <
+			ComputAFitness(&swarm.Particle[swarm.GBestIndex],swarm.Particle[swarm.GBestIndex].P))
 		{
-			//mppbest = ComputAFitness(swarm.Particle[i].P);
 			swarm.GBestIndex = i;
 		}
 
 	}
 
-	for (j = 0; j < Dim; j++)
+	for (j = 1; j < Dim+1; j++)
 	{
 		swarm.GBest[j] = swarm.Particle[swarm.GBestIndex].P[j];
 	}
-
 	printf("The %dth iteraction.\n", cur_n);
 	printf("GBestIndex:%d \n", swarm.GBestIndex);
 	printf("GBest:");
 	for (j = 1; j<Dim + 1; j++)
 	{
-		printf("%.4f ,", swarm.GBest[j]);
+		printf("%.1f ,", swarm.GBest[j]);
 	}
 	printf("\n");
-	printf("Fitness of GBest: %f \n\n", ComputAFitness(swarm.Particle[swarm.GBestIndex].P));
+	printf("Fitness of GBest: %f \n\n", ComputAFitness(&swarm.Particle[swarm.GBestIndex],swarm.Particle[swarm.GBestIndex].P));
 }
