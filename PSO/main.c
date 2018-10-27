@@ -14,27 +14,45 @@
  **********************************************************************************************************/
 #include "pso.h"
 #include "stdio.h"
+extern double ComputAFitness(struct PARTICLE* particle);
 int main(int argc, const char *argv[])
 {
 	cur_n = 0;           //当前代数
 	RandInitofSwarm();             //初始化粒子群
-	while (cur_n++ != 1000)//停止条件为代数ITE_N
+	//UpdateofVandX();        //速度和位置更新
+	//UpdatePandGbest();    //更新个体历史最优解P和全局最优解GBest
+	lastGlobal = swarm.GBestIndex;
+	swarm.Particle[0].Fitness = swarm.Particle[lastGlobal].Fitness;
+	for ( int i=1;i<Dim+1;i++)
+	{
+		swarm.Particle[0].X[i] = swarm.Particle[lastGlobal].X[i];
+	}
+
+	while (cur_n++ != ITE_N-1)//停止条件为代数ITE_N
 	{
 		UpdateofVandX();        //速度和位置更新
 		UpdatePandGbest();    //更新个体历史最优解P和全局最优解GBest
-		//下面这个循环很重要，
-		//每次迭代后，将每个粒子的numofLoad属性全部归零。不然后面的 
-		// numofVehicle( )函数会出错，导致计算不同时段的cost出现异常值
-
-		for(int i= 1;i<PNum+1;i++)
+		if((ComputAFitness(&swarm.Particle[0]))>ComputAFitness(&swarm.Particle[swarm.GBestIndex])) //
 		{
-
-			swarm.Particle[i].numOfLoad1 = 0;
-			swarm.Particle[i].numOfLoad2 = 0;
-			swarm.Particle[i].numOfLoad3 = 0;
+			lastGlobal = swarm.GBestIndex;
+			swarm.Particle[0].Fitness = swarm.Particle[lastGlobal].Fitness;
+			for (int i = 1; i < Dim + 1; i++)
+			{
+				swarm.Particle[0].X[i] = swarm.Particle[lastGlobal].X[i];
+			}
 		}
+		
+	
 
 	}
+	printf("本次程序执行后，所有迭代次数中最优的值适应度为为： %f\n ", swarm.Particle[0].Fitness);
+	for (int i=1;i<Dim+1;i++)
+	{
+		{
+			printf("%.1f,", swarm.Particle[0].X[i]);
+		}
+	}
+
 	//getchar();
 	return 0;
 }

@@ -2,9 +2,9 @@
 #define _PSO_H_
 #define NumofVehicle 10 //目前车辆总数
 //不同路径的最大车流量
-#define  capOfLoad1   8    //pcu/h
-#define  capOfLoad2   9    //pcu/h
-#define  capOfLoad3   7    //pcu/h
+#define  capOfLoad1   8    //pcu/h No.4 号道路
+#define  capOfLoad2   9    //pcu/h No.2 号道路
+#define  capOfLoad3   6    //pcu/h No.1 号道路
 
 /**
 * \method
@@ -15,10 +15,11 @@
 *
 */
 #define Dim NumofVehicle //粒子维度 
-#define PNum 20 	     //种群规模        由于每辆车有3种可能 所以一共有3^10=59049种解
-#define ITE_N  5  	 //最大迭代次数
+#define PNum 50 	     //种群规模        由于每辆车有3种可能 所以一共有3^10=59049种解
+#define ITE_N  100 	 //最大迭代次数
 int cur_n;			//当前迭代次数
-
+int lastGlobal ;  // 上一次迭代中种群中的最优值
+double curGlobal ;   // 本次迭代中种群中的最优值
 					/*惯性权重函数*/
 #define W_START 1.4
 #define W_END	0.4
@@ -26,11 +27,10 @@ int cur_n;			//当前迭代次数
 					/*个体和种群结构体*/
 struct PARTICLE
 {
-	double X[Dim + 1];     //粒子当前位置
+	double X[Dim + 1];   //粒子当前位置
 	double P[Dim + 1]; 	 //粒子当前最优值的位置
-	double V[Dim + 1];     //粒子当前速度
+	double V[Dim + 1];   //粒子当前速度
 	double Fitness;      //粒子当前适应度
-	//if (Dim == n)//对于每一个粒子，当达到最后一维度时（也就是最后一辆车），对三条道路的车辆数进行置零。
 	int	numOfLoad1;
 	int	numOfLoad2;
 	int	numOfLoad3;
