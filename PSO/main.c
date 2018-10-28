@@ -1,10 +1,11 @@
 #include "pso.h"
 #include "stdio.h"
-
+extern FILE * fp;
 
 int main(int argc, const char *argv[])
 {
 	cur_n = 0;           //当前代数
+	numofacc = 0;
 	RandInitofSwarm();             //初始化粒子群
 	while (cur_n++ != ITE_N)
 	{
@@ -12,7 +13,9 @@ int main(int argc, const char *argv[])
 		UpdateofVandX();        //速度和位置更新
 
 	}
-
-	getchar();
+	fclose(fp);
+	printf("\n");
+	printf("numofAccuracy=%d\n",numofacc);
+	//getchar();
 	return 0;
 }
