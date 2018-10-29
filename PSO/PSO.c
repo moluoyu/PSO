@@ -3,17 +3,13 @@
 #include "time.h"
 #include "math.h"
 #include "pso.h"
-//#include <>
-//#include <cmath>
-FILE * fp;
 
 
 /*计算适应度函数的适应度*/
 static double ComputAFitness(double X[]) //求x^2 + y^2 + 3 最小值
 {
 
-	//return X[0] * X[0] + X[1] * X[1] + ;
-	return 100 * ((X[0] * X[0] - X[1])*(X[0] * X[0] - X[1])) + (1 - X[0])*(1 - X[0]);
+	return X[0] * X[0] + X[1] * X[1] + 3;
 }
 
 //初始化种群
@@ -25,9 +21,9 @@ void RandInitofSwarm(void)
 	swarm.C2 = 2.0;
 	for (j = 0; j < Dim; j++)
 	{
-		swarm.Xdown[j] = -5.12;    //搜索空间范围
-		swarm.Xup[j] = 5.12;
-		swarm.Vmax[j] = 5.12;       //粒子飞翔速度最大值  最大速度一般设为粒子的最大取值范围
+		swarm.Xdown[j] = -10;    //搜索空间范围
+		swarm.Xup[j] = 10;
+		swarm.Vmax[j] = 0.1;       //粒子飞翔速度最大值
 	}
 
 	srand((unsigned)time(NULL));
@@ -98,7 +94,6 @@ void UpdateofVandX(void)
 void UpdatePandGbest(void)
 {
 	int i, j;
-	double Goalbest;
 	//update of P if the X is bigger than current P
 	for (i = 0; i < PNum; i++)
 	{
@@ -134,16 +129,8 @@ void UpdatePandGbest(void)
 	printf("GBest:");
 	for (j = 0; j<Dim; j++)
 	{
-		printf("%.9e,", swarm.GBest[j]);
+		printf("%.4f ,", swarm.GBest[j]);
 	}
 	printf("\n");
-	Goalbest=ComputAFitness(swarm.Particle[swarm.GBestIndex].P);
-	fp = fopen("data.txt", "a+");
-	fprintf(fp, "%d\t", cur_n);
-	fprintf(fp, "%.9e\n", Goalbest);
-	if (Goalbest > -ACCURACY_F1 &&Goalbest >ACCURACY_F1) // 判断最优值是否在给定的精确度范围内
-	{
-		numofacc++;
-	}
-	printf("Fitness of GBest: %f \n\n", Goalbest);
+	printf("Fitness of GBest: %f \n\n", ComputAFitness(swarm.Particle[swarm.GBestIndex].P));
 }
